@@ -36,7 +36,7 @@ export default RegistrationScreen = () => {
                 marginTop: isKeaboardShown ? 195 : 219,
               },
               android: {
-                marginTop: isKeaboardShown ? -130 : 0,
+                marginTop: isKeaboardShown ? -60 : 0,
               },
             }),
           }}
@@ -49,7 +49,7 @@ export default RegistrationScreen = () => {
             </View>
           </View>
           <View
-            style={{ ...styles.form, paddingBottom: isKeaboardShown ? 32 : 45 }}
+            style={styles.form }
           >
             <Text style={styles.title}>Реєстрація</Text>
             <View>
@@ -180,7 +180,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     justifyContent: "center",
   },
-  form: {},
+  form: {
+    paddingBottom: 45
+  },
   title: {
     fontFamily: "Roboto-Medium",
     fontSize: 30,

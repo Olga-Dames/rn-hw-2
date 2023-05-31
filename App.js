@@ -19,8 +19,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <RegistrationScreen />
-      {/* <LoginScreen /> */}
+      {/* <RegistrationScreen /> */}
+      <LoginScreen />
       {/* <PostsScreen /> */}
       <StatusBar style="auto" />
     </SafeAreaView>

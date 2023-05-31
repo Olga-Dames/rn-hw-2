@@ -12,6 +12,10 @@ import {
 
 export default LoginScreen = () => {
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState({
+    email: false,
+    password: false,
+  });
   return (
     <ImageBackground
       style={styles.background}
@@ -26,10 +30,10 @@ export default LoginScreen = () => {
             ...styles.form,
             ...Platform.select({
               ios: {
-                marginTop: isKeaboardShown ? 195 : 219,
+                marginTop: isKeaboardShown ? 456 : 0,
               },
               android: {
-                marginTop: isKeaboardShown ? -123 : 0,
+                marginTop: isKeaboardShown ? -40 : 0,
               },
             }),
           }}
@@ -38,19 +42,35 @@ export default LoginScreen = () => {
 
           <View>
             <TextInput
-            onFocus={() => {
-              setIsKeyboardShown(true);
-            }}
-              style={styles.input}
+              onFocus={() => {
+                setIsKeyboardShown(true);
+                setIsInputFocused({ ...isInputFocused, email: true });
+              }}
+              onBlur={() => {
+                setIsKeyboardShown(false);
+                setIsInputFocused({
+                  ...isInputFocused,
+                  email: false,
+                });
+              }}
+              style={[styles.input, isInputFocused.email && styles.focused]}
               placeholder="Адреса електронної пошти"
             />
           </View>
           <View style={styles.inputBox}>
             <TextInput
-            onFocus={() => {
-              setIsKeyboardShown(true);
-            }}
-              style={styles.input}
+              onFocus={() => {
+                setIsKeyboardShown(true);
+                setIsInputFocused({ ...isInputFocused, password: true });
+              }}
+              onBlur={() => {
+                setIsKeyboardShown(false);
+                setIsInputFocused({
+                  ...isInputFocused,
+                  password: false,
+                });
+              }}
+              style={[styles.input, isInputFocused.password && styles.focused]}
               placeholder="Пароль"
               secureTextEntry={true}
             />
@@ -97,6 +117,10 @@ const styles = StyleSheet.create({
   },
   placeholderColor: {
     color: "#BDBDBD",
+  },
+  focused: {
+    borderColor: "#FF6C00",
+    backgroundColor: "#fff",
   },
   form: {
     width: "100%",
