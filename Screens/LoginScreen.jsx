@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 
 export default LoginScreen = () => {
@@ -16,6 +17,18 @@ export default LoginScreen = () => {
     email: false,
     password: false,
   });
+  const initialState = {
+    email: "",
+    password: "",
+  };
+  const [data, setData] = useState(initialState);
+
+  const onLogin = () => {
+    setIsKeyboardShown(false);
+    setData(initialState);
+    console.log(data);
+    Keyboard.dismiss();
+  };
   return (
     <ImageBackground
       style={styles.background}
@@ -33,7 +46,7 @@ export default LoginScreen = () => {
                 marginTop: isKeaboardShown ? 456 : 0,
               },
               android: {
-                marginTop: isKeaboardShown ? -40 : 0,
+                marginTop: isKeaboardShown ? -150 : 0,
               },
             }),
           }}
@@ -47,7 +60,6 @@ export default LoginScreen = () => {
                 setIsInputFocused({ ...isInputFocused, email: true });
               }}
               onBlur={() => {
-                setIsKeyboardShown(false);
                 setIsInputFocused({
                   ...isInputFocused,
                   email: false,
@@ -55,6 +67,10 @@ export default LoginScreen = () => {
               }}
               style={[styles.input, isInputFocused.email && styles.focused]}
               placeholder="Адреса електронної пошти"
+              value={data.email}
+              onChangeText={(value) =>
+                setData((prevState) => ({ ...prevState, email: value }))
+              }
             />
           </View>
           <View style={styles.inputBox}>
@@ -64,7 +80,6 @@ export default LoginScreen = () => {
                 setIsInputFocused({ ...isInputFocused, password: true });
               }}
               onBlur={() => {
-                setIsKeyboardShown(false);
                 setIsInputFocused({
                   ...isInputFocused,
                   password: false,
@@ -73,12 +88,20 @@ export default LoginScreen = () => {
               style={[styles.input, isInputFocused.password && styles.focused]}
               placeholder="Пароль"
               secureTextEntry={true}
+              value={data.password}
+              onChangeText={(value) =>
+                setData((prevState) => ({ ...prevState, password: value }))
+              }
             />
             <TouchableOpacity style={styles.showPassword} activeOpacity={1}>
               <Text style={styles.showPasswordText}>Показати</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.submit} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.submit}
+            activeOpacity={0.7}
+            onPress={onLogin}
+          >
             <Text style={styles.btnText}>Увійти</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.accountBtn} activeOpacity={1}>

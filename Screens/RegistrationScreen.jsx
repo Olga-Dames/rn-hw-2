@@ -5,10 +5,10 @@ import {
   ImageBackground,
   TextInput,
   Text,
-  Image,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import AddAvatarIcon from "./icons/addAvatarIcon";
 
@@ -19,6 +19,20 @@ export default RegistrationScreen = () => {
     email: false,
     password: false,
   });
+
+  const initialState = {
+    login: "",
+    email: "",
+    password: "",
+  };
+  const [data, setData] = useState(initialState);
+
+  const onRegister = () => {
+    setIsKeyboardShown(false);
+    console.log(data);
+    setData(initialState)
+    Keyboard.dismiss();
+  };
   return (
     <ImageBackground
       style={styles.background}
@@ -36,21 +50,24 @@ export default RegistrationScreen = () => {
                 marginTop: isKeaboardShown ? 195 : 219,
               },
               android: {
-                marginTop: isKeaboardShown ? -60 : 0,
+                marginTop: isKeaboardShown ? -185 : 0,
               },
             }),
           }}
         >
-          <View style={{...styles.avatarBox, top: isKeaboardShown ? "-20%": '-15%'}}>
+          <View
+            style={{
+              ...styles.avatarBox,
+              top: isKeaboardShown ? "-12%" : "-15%",
+            }}
+          >
             <View style={styles.iconBtn}>
               <TouchableOpacity>
                 <AddAvatarIcon />
               </TouchableOpacity>
             </View>
           </View>
-          <View
-            style={styles.form }
-          >
+          <View style={styles.form}>
             <Text style={styles.title}>Реєстрація</Text>
             <View>
               <TextInput
@@ -59,7 +76,6 @@ export default RegistrationScreen = () => {
                   setIsInputFocused({ ...isInputFocused, login: true });
                 }}
                 onBlur={() => {
-                  setIsKeyboardShown(false);
                   setIsInputFocused({
                     ...isInputFocused,
                     login: false,
@@ -68,6 +84,10 @@ export default RegistrationScreen = () => {
                 style={[styles.input, isInputFocused.login && styles.focused]}
                 placeholder="Логін"
                 placeholderTextColor={styles.placeholderColor}
+                value={data.login}
+                onChangeText={(value) =>
+                  setData((prevState) => ({ ...prevState, login: value }))
+                }
               />
             </View>
             <View>
@@ -77,7 +97,6 @@ export default RegistrationScreen = () => {
                   setIsInputFocused({ ...isInputFocused, email: true });
                 }}
                 onBlur={() => {
-                  setIsKeyboardShown(false);
                   setIsInputFocused({
                     ...isInputFocused,
                     email: false,
@@ -85,12 +104,15 @@ export default RegistrationScreen = () => {
                 }}
                 style={[styles.input, isInputFocused.email && styles.focused]}
                 placeholder="Адреса електронної пошти"
+                value={data.email}
+                onChangeText={(value) =>
+                  setData((prevState) => ({ ...prevState, email: value }))
+                }
               />
             </View>
             <View style={styles.inputBox}>
               <TextInput
                 onFocus={() => {
-                  setIsKeyboardShown(true);
                   setIsInputFocused({ ...isInputFocused, password: true });
                 }}
                 onBlur={() => {
@@ -106,6 +128,10 @@ export default RegistrationScreen = () => {
                 ]}
                 placeholder="Пароль"
                 secureTextEntry={true}
+                value={data.password}
+                onChangeText={(value) =>
+                  setData((prevState) => ({ ...prevState, password: value }))
+                }
               />
               <TouchableOpacity style={styles.showPassword} activeOpacity={1}>
                 <Text style={styles.showPasswordText}>Показати</Text>
@@ -115,6 +141,7 @@ export default RegistrationScreen = () => {
             <TouchableOpacity
               style={{ ...styles.submit, marginTop: isKeaboardShown ? 16 : 27 }}
               activeOpacity={0.7}
+              onPress={onRegister}
             >
               <Text style={styles.btnText}>Зареєструватися</Text>
             </TouchableOpacity>
@@ -181,7 +208,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   form: {
-    paddingBottom: 45
+    paddingBottom: 45,
   },
   title: {
     fontFamily: "Roboto-Medium",

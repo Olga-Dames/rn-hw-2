@@ -1,6 +1,6 @@
 import {useFonts} from 'expo-font'
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native';
 import RegistrationScreen from './Screens/RegistrationScreen';
 import LoginScreen from './Screens/LoginScreen';
 import PostsScreen from './Screens/PostsScreen';
@@ -18,12 +18,14 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={styles.container}>
       {/* <RegistrationScreen /> */}
       <LoginScreen />
       {/* <PostsScreen /> */}
       <StatusBar style="auto" />
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
