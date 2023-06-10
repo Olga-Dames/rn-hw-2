@@ -1,17 +1,13 @@
 import { useState } from "react";
 import ExitIcon from "./icons/exitIcon";
-import UserIcon from "./icons/userIcon";
-import PlusIcon from "./icons/plusIcon";
-import GridIcon from "./icons/gridIcon";
+import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import {
   View,
   StyleSheet,
   ImageBackground,
-  TextInput,
   Text,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
   FlatList,
   Image,
 } from "react-native";
@@ -70,13 +66,13 @@ export default PostsScreen = () => {
       </View>
       <View style={styles.footer}>
         <TouchableOpacity style={styles.grid} activeOpacity={1}>
-          <GridIcon />
+        <AntDesign name="appstore-o" size={24} color={"#BDBDBD"}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.addPost} activeOpacity={0.7}>
-          <PlusIcon />
+        <Feather name="plus" size={18} color={"#fff"}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.userIcon} activeOpacity={1}>
-          <UserIcon />
+        <Feather name="user" size={24} color={"#BDBDBD"}/>
         </TouchableOpacity>
       </View>
     </ImageBackground>

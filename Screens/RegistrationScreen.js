@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { debounce } from "lodash";
 import {
   View,
   StyleSheet,
@@ -10,7 +11,13 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
-import AddAvatarIcon from "./icons/addAvatarIcon";
+import { AntDesign } from "@expo/vector-icons";
+
+const initialState = {
+  login: "",
+  email: "",
+  password: "",
+};
 
 export default RegistrationScreen = () => {
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
@@ -20,19 +27,35 @@ export default RegistrationScreen = () => {
     password: false,
   });
 
-  const initialState = {
-    login: "",
-    email: "",
-    password: "",
-  };
   const [data, setData] = useState(initialState);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+  const [checkValidEmail, setCheckValidEmail] = useState(true);
 
   const onRegister = () => {
+    if (!checkValidEmail) {
+      return;
+    }
+    if (data.login === "" || data.email === "" || data.password === "") {
+      console.log("All fields must be filled");
+      return;
+    }
     setIsKeyboardShown(false);
     console.log(data);
-    setData(initialState)
+    setData(initialState);
     Keyboard.dismiss();
   };
+
+  const handleCheckEmail = (value) => {
+    let redex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    setCheckValidEmail(redex.test(value));
+  };
+
+  const debouncedHandleEmailCheck = debounce(handleCheckEmail, 1000);
+  const handleValidEmail = (value) => {
+    setData((prevState) => ({ ...prevState, email: value }));
+    debouncedHandleEmailCheck(value);
+  };
+
   return (
     <ImageBackground
       style={styles.background}
@@ -63,7 +86,7 @@ export default RegistrationScreen = () => {
           >
             <View style={styles.iconBtn}>
               <TouchableOpacity>
-                <AddAvatarIcon />
+                <AntDesign name="pluscircleo" size={25} color={"#FF6C00"} />
               </TouchableOpacity>
             </View>
           </View>
@@ -88,27 +111,34 @@ export default RegistrationScreen = () => {
                 onChangeText={(value) =>
                   setData((prevState) => ({ ...prevState, login: value }))
                 }
+                textContentType="username"
               />
             </View>
-            <View>
+            <View style={styles.emailInput}>
               <TextInput
                 onFocus={() => {
                   setIsKeyboardShown(true);
                   setIsInputFocused({ ...isInputFocused, email: true });
                 }}
+                style={[styles.input, isInputFocused.email && styles.focused]}
+                placeholder="Адреса електронної пошти"
+                value={data.email}
+                onChangeText={handleValidEmail}
                 onBlur={() => {
                   setIsInputFocused({
                     ...isInputFocused,
                     email: false,
                   });
                 }}
-                style={[styles.input, isInputFocused.email && styles.focused]}
-                placeholder="Адреса електронної пошти"
-                value={data.email}
-                onChangeText={(value) =>
-                  setData((prevState) => ({ ...prevState, email: value }))
-                }
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
+              {!checkValidEmail ? (
+                <Text style={styles.validation}> Wrong format</Text>
+              ) : (
+                <Text style={styles.validation}></Text>
+              )}
             </View>
             <View style={styles.inputBox}>
               <TextInput
@@ -127,14 +157,25 @@ export default RegistrationScreen = () => {
                   isInputFocused.password && styles.focused,
                 ]}
                 placeholder="Пароль"
-                secureTextEntry={true}
+                secureTextEntry={isPasswordHidden}
                 value={data.password}
                 onChangeText={(value) =>
                   setData((prevState) => ({ ...prevState, password: value }))
                 }
+                textContentType="password"
               />
-              <TouchableOpacity style={styles.showPassword} activeOpacity={1}>
-                <Text style={styles.showPasswordText}>Показати</Text>
+              <TouchableOpacity
+                style={styles.showPassword}
+                activeOpacity={1}
+                onPress={() => {
+                  setIsPasswordHidden((prevState) => !prevState);
+                }}
+              >
+                {isPasswordHidden ? (
+                  <Text style={styles.showPasswordText}>Показати</Text>
+                ) : (
+                  <Text style={styles.showPasswordText}>Сховати </Text>
+                )}
               </TouchableOpacity>
             </View>
 
@@ -253,5 +294,16 @@ const styles = StyleSheet.create({
     paddingBottom: 45,
     backgroundColor: "#fff",
     flex: 0,
+  },
+  emailInput: {
+    position: "relative",
+  },
+  validation: {
+    position: "absolute",
+    right: 32,
+    top: 14,
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
+    color: "red",
   },
 });

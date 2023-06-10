@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { debounce } from "lodash";
 import {
   View,
   StyleSheet,
@@ -11,24 +12,45 @@ import {
   Keyboard,
 } from "react-native";
 
+const initialState = {
+  email: "",
+  password: "",
+};
 export default LoginScreen = () => {
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
     email: false,
     password: false,
   });
-  const initialState = {
-    email: "",
-    password: "",
-  };
+
   const [data, setData] = useState(initialState);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+  const [checkValidEmail, setCheckValidEmail] = useState(true);
 
   const onLogin = () => {
+    if (!checkValidEmail) {
+      return;
+    }
+    if (data.email === "" || data.password === "") {
+      console.log("All fields must be filled");
+      return;
+    }
     setIsKeyboardShown(false);
     setData(initialState);
     console.log(data);
     Keyboard.dismiss();
   };
+  const handleCheckEmail = (value) => {
+    let redex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    setCheckValidEmail(redex.test(value));
+  };
+
+  const debouncedHandleEmailCheck = debounce(handleCheckEmail, 500);
+  const handleValidEmail = (value) => {
+    setData((prevState) => ({ ...prevState, email: value }));
+    debouncedHandleEmailCheck(value);
+  };
+
   return (
     <ImageBackground
       style={styles.background}
@@ -53,25 +75,31 @@ export default LoginScreen = () => {
         >
           <Text style={styles.title}>Увійти</Text>
 
-          <View>
+          <View style={styles.emailInput}>
             <TextInput
               onFocus={() => {
                 setIsKeyboardShown(true);
                 setIsInputFocused({ ...isInputFocused, email: true });
               }}
+              style={[styles.input, isInputFocused.email && styles.focused]}
+              placeholder="Адреса електронної пошти"
+              value={data.email}
+              onChangeText={handleValidEmail}
               onBlur={() => {
                 setIsInputFocused({
                   ...isInputFocused,
                   email: false,
                 });
               }}
-              style={[styles.input, isInputFocused.email && styles.focused]}
-              placeholder="Адреса електронної пошти"
-              value={data.email}
-              onChangeText={(value) =>
-                setData((prevState) => ({ ...prevState, email: value }))
-              }
+              textContentType="emailAddress"
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
+            {!checkValidEmail ? (
+              <Text style={styles.validation}> Wrong format</Text>
+            ) : (
+              <Text style={styles.validation}></Text>
+            )}
           </View>
           <View style={styles.inputBox}>
             <TextInput
@@ -87,13 +115,19 @@ export default LoginScreen = () => {
               }}
               style={[styles.input, isInputFocused.password && styles.focused]}
               placeholder="Пароль"
-              secureTextEntry={true}
+              secureTextEntry={isPasswordHidden}
               value={data.password}
               onChangeText={(value) =>
                 setData((prevState) => ({ ...prevState, password: value }))
               }
             />
-            <TouchableOpacity style={styles.showPassword} activeOpacity={1}>
+            <TouchableOpacity
+              style={styles.showPassword}
+              activeOpacity={1}
+              onPress={() => {
+                setIsPasswordHidden((prevState) => !prevState);
+              }}
+            >
               <Text style={styles.showPasswordText}>Показати</Text>
             </TouchableOpacity>
           </View>
@@ -131,7 +165,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     fontFamily: "Roboto-Regular",
     fontSize: 16,
-    lineHeight: 1.19,
+    lineHeight: 19,
     color: "#212121",
     borderRadius: 8,
     backgroundColor: "#F6F6F6",
@@ -202,5 +236,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#1B4371",
     textDecorationLine: "underline",
+  },
+  emailInput: {
+    position: "relative",
+  },
+  validation: {
+    position: "absolute",
+    right: 32,
+    top: 14,
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
+    color: "red",
   },
 });
