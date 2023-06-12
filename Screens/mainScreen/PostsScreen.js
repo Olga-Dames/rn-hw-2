@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ExitIcon from "./icons/exitIcon";
+import ExitIcon from "../../assets/icons/exitIcon";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import {
@@ -18,32 +18,17 @@ const Users = [
     name: "Polina Kuyanova",
     email: "fsdlfbdofvsed@gmail.com",
   },
-  {
-    id: 2,
-    name: "Natalia Romanova",
-    email: "polina123455@gmail.com",
-  },
-  {
-    id: 3,
-    name: "Mihail Reshetnikov",
-    email: "dizraelly0201@gmail.com",
-  },
-  {
-    id: 4,
-    name: "Johnny Deep",
-    email: "lena@mail.com",
-  },
 ];
 export default PostsScreen = () => {
   const [users, setUsers] = useState(Users);
   return (
     <ImageBackground style={styles.background} resizeMode="cover">
-      <View style={styles.header}>
-        <Text style={styles.title}>Публікації</Text>
-        <TouchableOpacity style={styles.exitBtn} activeOpacity={1}>
+      {/* <View style={styles.header}> */}
+        {/* <Text style={styles.title}>Публікації</Text> */}
+        {/* <TouchableOpacity style={styles.exitBtn} activeOpacity={1}>
           <ExitIcon />
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity> */}
+      {/* </View> */}
       <View style={styles.posts}>
         <FlatList
           data={users}
@@ -51,7 +36,7 @@ export default PostsScreen = () => {
             <View style={styles.userInfo}>
               <View style={styles.userAva}>
                 <Image
-                  source={require("../assets/images.jpg")}
+                  source={require("../../assets/images.jpg")}
                   style={styles.image}
                 />
               </View>
@@ -64,7 +49,7 @@ export default PostsScreen = () => {
           keyExtractor={(item) => item.id}
         />
       </View>
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <TouchableOpacity style={styles.grid} activeOpacity={1}>
         <AntDesign name="appstore-o" size={24} color={"#BDBDBD"}/>
         </TouchableOpacity>
@@ -74,7 +59,7 @@ export default PostsScreen = () => {
         <TouchableOpacity style={styles.userIcon} activeOpacity={1}>
         <Feather name="user" size={24} color={"#BDBDBD"}/>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </ImageBackground>
   );
 };
@@ -82,7 +67,7 @@ export default PostsScreen = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    color: "#fff",
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
@@ -93,14 +78,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#BDBDBD",
   },
-  title: {
-    marginRight: '30%',
-    textAlign: "center",
-    fontFamily: "Roboto-Medium",
-    fontSize: 17,
-    lineHeight: 22,
-    color: "#212121",
-  },
+  // title: {
+  //   marginRight: '30%',
+  //   textAlign: "center",
+    
+  // },
   exitBtn: {
     paddingRight: 16,
   },
@@ -141,22 +123,22 @@ const styles = StyleSheet.create({
     lineHeight: 13,
     color: "rgba(33,33,33,0.8)",
   },
-  footer: {
-    paddingBottom: 3,
-    paddingTop: 9,
-    flexDirection: "row",
-    justifyContent: 'center',
-    alignItems: "center",
-    gap: 31,
-    borderTopWidth: 1,
-    borderTopColor: "#BDBDBD",
-  },
-  addPost: {
-    height: 40,
-    width: 70,
-    backgroundColor: "#FF6C00",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  // footer: {
+  //   paddingBottom: 3,
+  //   paddingTop: 9,
+  //   flexDirection: "row",
+  //   justifyContent: 'center',
+  //   alignItems: "center",
+  //   gap: 31,
+  //   borderTopWidth: 1,
+  //   borderTopColor: "#BDBDBD",
+  // },
+  // addPost: {
+  //   height: 40,
+  //   width: 70,
+  //   backgroundColor: "#FF6C00",
+  //   borderRadius: 20,
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  // },
 });
