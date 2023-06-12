@@ -19,7 +19,7 @@ const initialState = {
   password: "",
 };
 
-export default RegistrationScreen = () => {
+export default RegistrationScreen = ({navigation}) => {
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
     login: false,
@@ -41,6 +41,7 @@ export default RegistrationScreen = () => {
     }
     setIsKeyboardShown(false);
     console.log(data);
+    navigation.navigate('Home')
     setData(initialState);
     Keyboard.dismiss();
   };
@@ -60,7 +61,7 @@ export default RegistrationScreen = () => {
     <ImageBackground
       style={styles.background}
       resizeMode="cover"
-      source={require("../assets/BgPic.jpg")}
+      source={require("../../assets/BgPic.jpg")}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -186,7 +187,7 @@ export default RegistrationScreen = () => {
             >
               <Text style={styles.btnText}>Зареєструватися</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.accountBtn} activeOpacity={1}>
+            <TouchableOpacity style={styles.accountBtn} activeOpacity={1} onPress={() => navigation.navigate('Login')}>
               <Text style={styles.accountBtnText}>Вже є акаунт? Увійти</Text>
             </TouchableOpacity>
           </View>
