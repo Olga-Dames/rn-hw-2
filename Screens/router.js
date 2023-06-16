@@ -40,7 +40,7 @@ export const useRoute = (isAuth) => {
 //   return <Home />;
 };
 
-export function HomeTabs() {
+export function HomeTabs({navigation}) {
   return (
     <MainTab.Navigator
       screenOptions={{
@@ -71,7 +71,7 @@ export function HomeTabs() {
           },
           headerTitleAlign: "center",
           headerRight: () => (
-            <TouchableOpacity activeOpacity={1}>
+            <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('Login')}>
               <ExitIcon />
             </TouchableOpacity>
           ),
