@@ -7,10 +7,8 @@ import LoginScreen from "./auth/LoginScreen";
 import PostsScreen from "./mainScreen/PostsScreen";
 import CreatePostsScreen from "./mainScreen/CreatePostsScreen";
 import ProfileScreen from "./mainScreen/ProfileScreen";
-import Home from "./mainScreen/Home";
-import { AntDesign } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import ExitIcon from "../assets/icons/exitIcon";
+import DefaultScreenPosts from "./nestedScreens/DefaultScreenPosts";
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -31,7 +29,7 @@ export const useRoute = (isAuth) => {
         />
         <AuthStack.Screen
           options={{ headerShown: false }}
-          name="Home"
+          name="DefaultScreenPosts"
           component={HomeTabs}
         />
       </AuthStack.Navigator>
@@ -44,7 +42,7 @@ export function HomeTabs({navigation}) {
   return (
     <MainTab.Navigator
       screenOptions={{
-        initialRouteName: "Home",
+        initialRouteName: "DefaultScreenPosts",
         tabBarShowLabel: false,
         tabBarShowIcon: true,
         tabBarStyle: {
@@ -72,7 +70,7 @@ export function HomeTabs({navigation}) {
           headerTitleAlign: "center",
           headerRight: () => (
             <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('Login')}>
-              <ExitIcon />
+              <Ionicons name="exit-outline" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           ),
           headerStyle: {
@@ -98,9 +96,10 @@ export function HomeTabs({navigation}) {
           ),
           headerLeft: () => (
             <TouchableOpacity activeOpacity={1}>
-              <AntDesign name="arrowleft" size={24} color={"#BDBDBD"} />
+              <AntDesign name="arrowleft" size={24} color={"#BDBDBD"} onPress={() => {navigation.navigate('HomePage')}}/>
             </TouchableOpacity>
           ),
+          tabBarStyle: {display: 'none'},
           headerLeftContainerStyle: {
             paddingLeft: 16,
           },

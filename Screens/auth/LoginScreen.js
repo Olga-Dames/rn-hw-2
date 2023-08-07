@@ -41,7 +41,7 @@ export default LoginScreen = () => {
     setIsKeyboardShown(false);
     setData(initialState);
     console.log(data);
-    navigation.navigate('Home')
+    navigation.navigate('DefaultScreenPosts')
     Keyboard.dismiss();
   };
   const handleCheckEmail = (value) => {

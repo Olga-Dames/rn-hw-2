@@ -41,7 +41,7 @@ export default RegistrationScreen = ({navigation}) => {
     }
     setIsKeyboardShown(false);
     console.log(data);
-    navigation.navigate('Home')
+    navigation.navigate('DefaultScreenPosts')
     setData(initialState);
     Keyboard.dismiss();
   };
