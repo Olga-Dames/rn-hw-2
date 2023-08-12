@@ -19,14 +19,18 @@ const initialState = {
   password: "",
 };
 
-export default RegistrationScreen = ({navigation}) => {
+import { useDispatch } from "react-redux";
+import { authSignUp } from "../../redux/auth/authOperations";
+
+export default RegistrationScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
     login: false,
     email: false,
     password: false,
   });
-
   const [data, setData] = useState(initialState);
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [checkValidEmail, setCheckValidEmail] = useState(true);
@@ -41,9 +45,10 @@ export default RegistrationScreen = ({navigation}) => {
     }
     setIsKeyboardShown(false);
     console.log(data);
-    navigation.navigate('DefaultScreenPosts')
+    // navigation.navigate("DefaultScreenPosts");
     setData(initialState);
     Keyboard.dismiss();
+    dispatch(authSignUp(data));
   };
 
   const handleCheckEmail = (value) => {
@@ -187,7 +192,11 @@ export default RegistrationScreen = ({navigation}) => {
             >
               <Text style={styles.btnText}>Зареєструватися</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.accountBtn} activeOpacity={1} onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity
+              style={styles.accountBtn}
+              activeOpacity={1}
+              onPress={() => navigation.navigate("Login")}
+            >
               <Text style={styles.accountBtnText}>Вже є акаунт? Увійти</Text>
             </TouchableOpacity>
           </View>

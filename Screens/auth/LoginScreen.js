@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { debounce } from "lodash";
-import {useNavigation} from '@react-navigation/native'
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -13,12 +13,16 @@ import {
   Keyboard,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignIn } from "../../redux/auth/authOperations";
+
 const initialState = {
   email: "",
   password: "",
 };
 
 export default LoginScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
@@ -40,9 +44,12 @@ export default LoginScreen = () => {
     }
     setIsKeyboardShown(false);
     setData(initialState);
-    console.log(data);
-    navigation.navigate('DefaultScreenPosts')
+    console.log("data", data);
+    // navigation.navigate("DefaultScreenPosts");
+    navigation.navigate("DefaultScreenPosts");
+
     Keyboard.dismiss();
+    dispatch(authSignIn(data));
   };
   const handleCheckEmail = (value) => {
     let redex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
@@ -142,7 +149,11 @@ export default LoginScreen = () => {
           >
             <Text style={styles.btnText}>Увійти</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.accountBtn} activeOpacity={1} onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity
+            style={styles.accountBtn}
+            activeOpacity={1}
+            onPress={() => navigation.navigate("Register")}
+          >
             <Text style={styles.accountBtnText}>Немає акаунту? </Text>
             <Text style={styles.register}>Зареєструватися</Text>
           </TouchableOpacity>
