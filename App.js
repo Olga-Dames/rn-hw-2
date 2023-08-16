@@ -1,18 +1,17 @@
 import "react-native-gesture-handler";
+import { Main } from "./components/Main";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
-import { NavigationContainer } from "@react-navigation/native";
-import { useRoute } from "./Screens/router";
 import {
   StyleSheet,
   TouchableWithoutFeedback,
   SafeAreaView,
   Keyboard,
 } from "react-native";
-
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  const routing = useRoute(null)
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
@@ -24,14 +23,14 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
+    <Provider store={store}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.container}>
-          {routing}
+          <Main />
           <StatusBar style="auto" />
         </SafeAreaView>
       </TouchableWithoutFeedback>
-    </NavigationContainer>
+    </Provider>
   );
 }
 

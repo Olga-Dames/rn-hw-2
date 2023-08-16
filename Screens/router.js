@@ -1,24 +1,38 @@
 import React from "react";
+
 import { TouchableOpacity } from "react-native";
+
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
+
 import RegistrationScreen from "./auth/RegistrationScreen";
 import LoginScreen from "./auth/LoginScreen";
 import PostsScreen from "./mainScreen/PostsScreen";
 import CreatePostsScreen from "./mainScreen/CreatePostsScreen";
 import ProfileScreen from "./mainScreen/ProfileScreen";
-import Home from "./mainScreen/Home";
-import { AntDesign } from "@expo/vector-icons";
-import { Feather } from "@expo/vector-icons";
-import ExitIcon from "../assets/icons/exitIcon";
+import DefaultScreenPosts from "./nestedScreens/DefaultScreenPosts";
+
+import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
+
+import { useDispatch } from "react-redux";
+import { authSignOutUser } from "../redux/auth/authOperations";
 
 const AuthStack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
 
+function MyBackButton() {
+  const navigation = useNavigation();
+  return (
+    <TouchableOpacity onPress={() => navigation.goBack()}>
+      <AntDesign name="arrowleft" size={24} color={"#BDBDBD"} />
+    </TouchableOpacity>
+  );
+}
 export const useRoute = (isAuth) => {
   if (!isAuth) {
     return (
-      <AuthStack.Navigator>
+      <AuthStack.Navigator initialRouteName="Login">
         <AuthStack.Screen
           options={{ headerShown: false }}
           name="Login"
@@ -29,22 +43,21 @@ export const useRoute = (isAuth) => {
           name="Register"
           component={RegistrationScreen}
         />
-        <AuthStack.Screen
-          options={{ headerShown: false }}
-          name="Home"
-          component={HomeTabs}
-        />
       </AuthStack.Navigator>
     );
   }
-//   return <Home />;
+  return <HomeTabs />;
 };
 
 export function HomeTabs() {
+  const dispatch = useDispatch();
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
   return (
     <MainTab.Navigator
       screenOptions={{
-        initialRouteName: "Home",
+        // initialRouteName: "Home",
         tabBarShowLabel: false,
         tabBarShowIcon: true,
         tabBarStyle: {
@@ -59,6 +72,9 @@ export function HomeTabs() {
       }}
     >
       <MainTab.Screen
+        name="Home"
+        // component={DefaultScreenPosts}
+        component={PostsScreen}
         options={{
           title: "Публікації",
           titleStyle: {
@@ -71,8 +87,8 @@ export function HomeTabs() {
           },
           headerTitleAlign: "center",
           headerRight: () => (
-            <TouchableOpacity activeOpacity={1}>
-              <ExitIcon />
+            <TouchableOpacity activeOpacity={1} onPress={signOut}>
+              <Ionicons name="exit-outline" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           ),
           headerStyle: {
@@ -86,8 +102,6 @@ export function HomeTabs() {
             <AntDesign name="appstore-o" size={24} color={"#BDBDBD"} />
           ),
         }}
-        name="HomePage"
-        component={PostsScreen}
       />
       <MainTab.Screen
         name="Create"
@@ -96,11 +110,8 @@ export function HomeTabs() {
           tabBarIcon: ({ focused, size, color }) => (
             <Feather name="plus" size={18} color={"#fff"} />
           ),
-          headerLeft: () => (
-            <TouchableOpacity activeOpacity={1}>
-              <AntDesign name="arrowleft" size={24} color={"#BDBDBD"} />
-            </TouchableOpacity>
-          ),
+          headerLeft: () => MyBackButton(),
+          tabBarStyle: { display: "none" },
           headerLeftContainerStyle: {
             paddingLeft: 16,
           },
@@ -133,6 +144,11 @@ export function HomeTabs() {
       <MainTab.Screen
         options={{
           headerShown: false,
+          headerRight: () => (
+            <TouchableOpacity activeOpacity={1} onPress={signOut}>
+              <Ionicons name="exit-outline" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+          ),
           tabBarIcon: ({ focused, size, color }) => (
             <Feather name="user" size={24} color={"#BDBDBD"} />
           ),
