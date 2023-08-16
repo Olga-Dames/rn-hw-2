@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
+
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
-import { FontAwesome } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
+
+import db from "../../firebase/config";
+import app from "../../firebase/config";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 import {
   View,
   StyleSheet,
@@ -12,9 +19,13 @@ import {
   ScrollView,
   Image,
   Alert,
+  Keyboard,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { Keyboard } from "react-native";
+import { useSelector } from "react-redux";
+
+const storage = getStorage(db);
+const cloudDB = getFirestore(app);
 
 export default CreatePostsScreen = ({ navigation }) => {
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
@@ -23,6 +34,8 @@ export default CreatePostsScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState("");
   const [comment, setComment] = useState("");
+
+  const { userId, login } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -61,7 +74,6 @@ export default CreatePostsScreen = ({ navigation }) => {
         longitude: location.coords.longitude,
       };
       setLocation(coords);
-      console.log("take", location);
     } catch (error) {
       console.log(error);
     }
@@ -72,14 +84,42 @@ export default CreatePostsScreen = ({ navigation }) => {
       Alert.alert("Завантажте фото");
       return;
     }
-    console.log("send", location);
+    uploadPostToServer();
     clearData();
-    navigation.navigate("DefaultScreen", {
-      photo,
-      location,
-      comment,
-      locationName,
-    });
+    navigation.navigate("HomePage");
+  };
+
+  const uploadPicToServer = async () => {
+    const uniquePostId = Date.now().toString();
+
+    try {
+      const response = await fetch(photo);
+
+      const file = await response.blob();
+      const storageRef = await ref(storage, `postImage/${uniquePostId}`);
+      await uploadBytes(storageRef, file);
+
+      const getPhotoRef = await getDownloadURL(storageRef);
+      return getPhotoRef;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const uploadPostToServer = async () => {
+    try {
+      const photo = await uploadPicToServer();
+      await addDoc(collection(cloudDB, "posts"), {
+        photo,
+        userId,
+        login,
+        location,
+        locationName,
+        comment,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const clearData = () => {

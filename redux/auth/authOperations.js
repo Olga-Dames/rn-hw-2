@@ -9,27 +9,31 @@ import {
 import { authSlice } from "./authReducer";
 import db from "../../firebase/config";
 
+const { updateUserProfile, authSignOut, authStateChange } = authSlice.actions;
+
 const auth = getAuth(db);
 
 export const authSignUp =
-  ({ login, email, password }) =>
+  ({ login, email, password, photo }) =>
   async (dispatch, getState) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       const user = await auth.currentUser;
-      const { displayName, uid } = await auth.currentUser;
+      const { displayName, uid, photoURL } = await auth.currentUser;
 
       await updateProfile(user, {
         displayName: login,
+        photoURL: photo,
       });
 
       const userUpdateProfile = {
         login: displayName,
         userId: uid,
+        photo: photoURL,
+        userEmail: email,
       };
 
-      dispatch(authSlice.actions.updateUserProfile(userUpdateProfile));
-      console.log("user", user);
+      dispatch(updateUserProfile(userUpdateProfile));
     } catch (error) {
       console.log(error.message);
     }
@@ -45,24 +49,23 @@ export const authSignIn =
     }
   };
 
-export const authSignOut = () => async (dispatch, getState) => {
+export const authSignOutUser = () => async (dispatch, getState) => {
   await signOut(auth);
-  dispatch(authSlice.actions.authSignOut());
+  dispatch(authSignOut());
 };
 
-export const authStateChange = () => async (dispatch, getState) => {
+export const authStateChangeUser = () => async (dispatch, getState) => {
   try {
     await onAuthStateChanged(auth, (user) => {
       if (user) {
         const userUpdateProfile = {
           login: user.displayName,
-          // userEmail: user.email,
           userId: user.uid,
-          // userEmail: user.email,
-          // photo: user.photoURL,
+          userEmail: user.email,
+          photo: user.photoURL,
         };
-        dispatch(authSlice.actions.authStateChange({ stateChange: true }));
-        dispatch(authSlice.actions.updateUserProfile(userUpdateProfile));
+        dispatch(authStateChange({ stateChange: true }));
+        dispatch(updateUserProfile(userUpdateProfile));
       }
     });
   } catch (error) {

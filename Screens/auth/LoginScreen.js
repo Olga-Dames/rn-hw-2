@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { debounce } from "lodash";
-import { useNavigation } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -21,9 +20,8 @@ const initialState = {
   password: "",
 };
 
-export default LoginScreen = () => {
+export default LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
     email: false,
@@ -44,10 +42,6 @@ export default LoginScreen = () => {
     }
     setIsKeyboardShown(false);
     setData(initialState);
-    console.log("data", data);
-    // navigation.navigate("DefaultScreenPosts");
-    navigation.navigate("DefaultScreenPosts");
-
     Keyboard.dismiss();
     dispatch(authSignIn(data));
   };

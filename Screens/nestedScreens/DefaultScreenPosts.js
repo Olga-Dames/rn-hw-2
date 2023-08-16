@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   View,
   StyleSheet,
@@ -7,35 +8,85 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
+import app from "../../firebase/config";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
+
+const db = getFirestore(app);
 
 export default DefaultScreenPosts = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [commentsCount, setCommentsCount] = useState({});
+
+  const { login, userEmail, photo } = useSelector((state) => state.auth);
+
+  const getAllPosts = async () => {
+    try {
+      await onSnapshot(collection(db, "posts"), (data) => {
+        const posts = data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setPosts(posts);
+        posts.forEach((post) => {
+          getCommentsCount(post.id);
+        });
+      });
+    } catch (error) {
+      console.log(error.message);
+      Alert.alert("Try again");
+    }
+  };
+
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
+    getAllPosts();
+  }, []);
+
+  useEffect(() => {
+    if (route.params?.commentsCount) {
+      setCommentsCount((prev) => ({
+        ...prev,
+        [route.params.postId]: route.params.commentsCount,
+      }));
     }
   }, [route.params]);
+
+  const getCommentsCount = async (postId) => {
+    try {
+      const commentsRef = collection(db, `posts/${postId}/comments`);
+      const queryRef = query(commentsRef);
+      const unsubscribe = onSnapshot(queryRef, (querySnapshot) => {
+        const commentsCount = querySnapshot.docs.length;
+        setCommentsCount((prev) => ({ ...prev, [postId]: commentsCount }));
+        return () => unsubscribe();
+      });
+    } catch (error) {
+      console.log(error.message);
+      setCommentsCount((prev) => ({ ...prev, [postId]: 0 }));
+    }
+  };
   return (
     <ImageBackground style={styles.background} resizeMode="cover">
       <View style={styles.posts}>
         <View style={styles.userInfo}>
           <View style={styles.userAva}>
-            <Image
-              source={require("../../assets/images.jpg")}
-              style={styles.image}
-            />
+            <Image source={{ uri: photo }} style={styles.image} />
           </View>
           <View style={styles.userText}>
-            <Text style={styles.userName}>Polina</Text>
-            <Text style={styles.userEmail}>polina@gmail.com</Text>
+            <Text style={styles.userName}>{login}</Text>
+            <Text style={styles.userEmail}>{userEmail}</Text>
           </View>
         </View>
         {posts.length === 0 && (
           <View>
-            <Text style={styles.noposts}>Нет публикаций</Text>
+            <Text style={styles.noposts}>Немає публікацій</Text>
           </View>
         )}
         {posts && (
@@ -50,7 +101,11 @@ export default DefaultScreenPosts = ({ route, navigation }) => {
                     <TouchableOpacity
                       style={styles.commentBtn}
                       onPress={() => {
-                        navigation.navigate("Comment");
+                        navigation.navigate("Comment", {
+                          prevScreen: "Home",
+                          postId: item.id,
+                          photo: item.photo,
+                        });
                       }}
                     >
                       <Feather
@@ -76,9 +131,7 @@ export default DefaultScreenPosts = ({ route, navigation }) => {
                         color={"#BDBDBD"}
                       />
                     </TouchableOpacity>
-                    <Text style={styles.locationText}>
-                      {item.locationName}
-                    </Text>
+                    <Text style={styles.locationText}>{item.locationName}</Text>
                   </View>
                 </View>
               </View>
@@ -133,9 +186,9 @@ const styles = StyleSheet.create({
   },
   noposts: {
     marginTop: 150,
-   textAlign: "center",
-   fontSize: 16,
-   color: "#212121"
+    textAlign: "center",
+    fontSize: 16,
+    color: "#212121",
   },
   postImg: {
     height: 240,
@@ -157,7 +210,7 @@ const styles = StyleSheet.create({
   postDescrContainer: {
     flex: 1,
     flexDirection: "row",
-    gap: 50
+    gap: 50,
   },
   commentBox: {
     flexDirection: "row",

@@ -10,21 +10,29 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Image,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+
+import { useDispatch } from "react-redux";
+import { authSignUp } from "../../redux/auth/authOperations";
+import { uploadBytes, ref, getDownloadURL, getStorage } from "firebase/storage";
+
+import db from "../../firebase/config";
+const storage = getStorage(db);
 
 const initialState = {
   login: "",
   email: "",
   password: "",
+  imageUri: null,
 };
-
-import { useDispatch } from "react-redux";
-import { authSignUp } from "../../redux/auth/authOperations";
 
 export default RegistrationScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
+  const [photo, setPhoto] = useState(null);
   const [isKeaboardShown, setIsKeyboardShown] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState({
     login: false,
@@ -35,7 +43,49 @@ export default RegistrationScreen = ({ navigation }) => {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [checkValidEmail, setCheckValidEmail] = useState(true);
 
-  const onRegister = () => {
+  const handleAddAvatar = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permission");
+      return;
+    }
+
+    const image = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (image.assets.length > 0) {
+      setPhoto(image.assets[0]);
+    }
+  };
+
+  const clearPhoto = () => {
+    setPhoto(null);
+  };
+
+  const uploadPhotoToServer = async () => {
+    const uniquePostId = Date.now().toString();
+    try {
+      const response = await fetch(photo.uri);
+      const file = await response.blob();
+
+      const storageRef = ref(
+        storage,
+        `profileAvatar/${uniquePostId}/${file.data.name}`
+      );
+      await uploadBytes(storageRef, file);
+
+      const getAvatarRef = await getDownloadURL(storageRef);
+      return getAvatarRef;
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const onRegister = async () => {
     if (!checkValidEmail) {
       return;
     }
@@ -43,12 +93,25 @@ export default RegistrationScreen = ({ navigation }) => {
       console.log("All fields must be filled");
       return;
     }
-    setIsKeyboardShown(false);
-    console.log(data);
-    // navigation.navigate("DefaultScreenPosts");
-    setData(initialState);
-    Keyboard.dismiss();
-    dispatch(authSignUp(data));
+    try {
+      setIsKeyboardShown(false);
+      Keyboard.dismiss();
+      const avatar = photo ? await uploadPhotoToServer() : null;
+
+      const user = {
+        login: data.login,
+        email: data.email,
+        password: data.password,
+        photo: avatar,
+      };
+
+      dispatch(authSignUp(user));
+
+      setData(initialState);
+      setPhoto(null);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const handleCheckEmail = (value) => {
@@ -84,18 +147,35 @@ export default RegistrationScreen = ({ navigation }) => {
             }),
           }}
         >
-          <View
-            style={{
-              ...styles.avatarBox,
-              top: isKeaboardShown ? "-12%" : "-15%",
-            }}
-          >
-            <View style={styles.iconBtn}>
-              <TouchableOpacity>
-                <AntDesign name="pluscircleo" size={25} color={"#FF6C00"} />
-              </TouchableOpacity>
+          {photo ? (
+            <View
+              style={{
+                ...styles.avatarBox,
+                top: isKeaboardShown ? "-12%" : "-15%",
+              }}
+            >
+              <Image style={styles.avatar} source={{ uri: photo.uri }} />
+              <View style={styles.iconBtn}>
+                <TouchableOpacity onPress={clearPhoto}>
+                  <Feather name="delete" size={25} color={"#212121"} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View
+              style={{
+                ...styles.avatarBox,
+                top: isKeaboardShown ? "-12%" : "-15%",
+              }}
+            >
+              <View style={styles.iconBtn}>
+                <TouchableOpacity onPress={handleAddAvatar}>
+                  <AntDesign name="pluscircleo" size={25} color={"#FF6C00"} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           <View style={styles.form}>
             <Text style={styles.title}>Реєстрація</Text>
             <View>
@@ -245,6 +325,11 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 16,
     backgroundColor: "#F6F6F6",
+  },
+  avatar: {
+    borderRadius: 16,
+    width: "100%",
+    height: "100%",
   },
   iconBtn: {
     position: "absolute",
